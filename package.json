@@ -1,0 +1,8 @@
+{
+  "name": "IssueTrackerBackend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/hackertoons-at-cad/IssueTrackerBackend.git",
+  "author": "Ngozi Izuchi, Sopia Enax, Victor O",
+  "license": "MIT"
+}
