@@ -10,7 +10,8 @@ lastname varchar(50) not null,
 datejoined datetime not null,
 email varchar(50) not null,
 password varchar(100),
-primary key(userid)
+primary key(userid),
+unique key (email)
 );
 
 create table if not exists issuetrackerdb.companies(
