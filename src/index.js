@@ -31,6 +31,11 @@ const loginValidatorRules = {
   password: 'required|string',
 };
 
+const companyValidatorRules = {
+  companyName: 'required|string',
+  category: 'string',
+};
+
 let payload = {
   error: [],
   result: [],
@@ -42,9 +47,6 @@ function setToken(user) {
   return jwt.sign(user, process.env.SCRETSTRING, { expiresIn: '30m' });
 }
 
-// function currentdatetime() {
-//   return new Date().toLocaleString();
-// }
 // ========== ENDPOINTS
 
 // SIGN UP
@@ -71,9 +73,7 @@ app.post('/api/signup', function (request, response) {
             selectResult
           ) {
             if (error) return response.status(500).json(error.message);
-            if (selectResult) {
-              response.status(201);
-            }
+            if (selectResult) return response.sendStatus(201);
           });
         }
       }
@@ -109,13 +109,51 @@ app.post('/api/login', function (request, response) {
   }
 });
 
+app.post('/api/company', middleWare, function (request, response) {
+  let { verifiedUser, company } = request?.body;
+  let validCompany = new Validator(company, companyValidatorRules);
+
+  if (validCompany.fails())
+    return response
+      .status(500)
+      .json({ ...payload, error: validCompany.errors });
+  if (validCompany.passes()) {
+    let insertCompany = `insert into issuetrackerdb.companies(name, category, createdby, datecreated) values(?, ?, ?, now())`;
+    connection.query(
+      insertCompany,
+      [company.companyName, company.category, verifiedUser.userid],
+      function (companyError, companyResult) {
+        if (companyError) return response.status(500).json(payload);
+        if (companyResult) {
+          let { insertId } = companyResult;
+          if (insertUserandCompany(verifiedUser.userid, insertId))
+            return response.sendStatus(201);
+          else return response.sendStatus(500);
+        }
+      }
+    );
+  }
+});
+
 function middleWare(request, response, next) {
   let auth = request.body?.auth;
   if (!auth) return response.sendStatus(403);
   if (auth) {
     let verify = jwt.verify(auth, process.env.SCRETSTRING);
-    console.log(verify);
+    request.body.verifiedUser = verify;
+    next();
   }
+}
+
+async function insertUserandCompany(userid, companyid) {
+  let insertUserAndCompany = `insert into issuetrackerdb.userandcompany(userid, companyid) values(?, ?)`;
+  connection.query(insertUserAndCompany, [userid, companyid], function (
+    userCompanyError,
+    userCompanyResult
+  ) {
+    if (userCompanyError) return false;
+    if (userCompanyResult) return true;
+  });
 }
 
 app.listen(PORT, () => console.log('listening on port'));

@@ -21,7 +21,8 @@ category varchar(50),
 createdby int not null,
 datecreated datetime not null,
 primary key(companyid),
-foreign key (createdby) references issuetrackerdb.users(userid)
+foreign key (createdby) references issuetrackerdb.users(userid),
+unique key (name, category)
 );
 
 create table if not exists issuetrackerdb.userandcompany(
