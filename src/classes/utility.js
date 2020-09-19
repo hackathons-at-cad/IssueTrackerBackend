@@ -1,11 +1,41 @@
-let crypto = require('crypto');
+let mysql = require('mysql');
 
-class Utility {
-  constructor() {}
+const connection = mysql.createConnection({
+  host: 'localhost',
+  password: '',
+  user: 'root',
+  database: 'issuetrackerdb',
+});
 
-  scretString() {
-    return crypto.randomBytes(64).toString('hex');
-  }
-}
+const signupValidatorRules = {
+  firstname: 'required|string',
+  lastname: 'required|string',
+  password: 'required',
+  email: 'required|email',
+  content: 'string',
+};
 
-module.exports.Utility;
+const loginValidatorRules = {
+  email: 'required|email',
+  password: 'required|string',
+};
+
+const companyValidatorRules = {
+  companyName: 'required|string',
+  category: 'string',
+};
+
+let payload = {
+  error: [],
+  result: [],
+  user: {},
+  auth: '',
+};
+
+module.exports = {
+  payload,
+  companyValidatorRules,
+  loginValidatorRules,
+  signupValidatorRules,
+  connection,
+};

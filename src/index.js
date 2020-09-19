@@ -2,46 +2,20 @@ require('dotenv').config();
 let express = require('express');
 let cors = require('cors');
 let jwt = require('jsonwebtoken');
-let mysql = require('mysql');
 let Validator = require('validatorjs');
+let {
+  payload,
+  companyValidatorRules,
+  loginValidatorRules,
+  signupValidatorRules,
+  connection,
+} = require('./classes/utility');
 
 const app = express();
 app.use([express.json(), cors()]);
 
 // ======== UTILITIES
 const PORT = process.env.PORT || 4000;
-
-const connection = mysql.createConnection({
-  host: 'localhost',
-  password: '',
-  user: 'root',
-  database: 'issuetrackerdb',
-});
-
-const signupValidatorRules = {
-  firstname: 'required|string',
-  lastname: 'required|string',
-  password: 'required',
-  email: 'required|email',
-  content: 'string',
-};
-
-const loginValidatorRules = {
-  email: 'required|email',
-  password: 'required|string',
-};
-
-const companyValidatorRules = {
-  companyName: 'required|string',
-  category: 'string',
-};
-
-let payload = {
-  error: [],
-  result: [],
-  user: {},
-  auth: '',
-};
 
 function setToken(user) {
   return jwt.sign(user, process.env.SCRETSTRING, { expiresIn: '30m' });
@@ -107,6 +81,20 @@ app.post('/api/login', function (request, response) {
       }
     });
   }
+});
+
+// COMPANY
+
+app.get('/api/company', middleWare, function (request, response) {
+  let selectQuery = `select * from issuetrackerdb.companies`;
+  connection.query(selectQuery, function (error, result) {
+    if (error)
+      return response.status(500).json({ ...payload, error: error.message });
+    if (result) {
+      console.log(result);
+      return response.status(200).json({ ...payload, result: result });
+    }
+  });
 });
 
 app.post('/api/company', middleWare, function (request, response) {
