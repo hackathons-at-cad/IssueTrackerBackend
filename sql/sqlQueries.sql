@@ -44,12 +44,13 @@ create table if not exists issuetrackerdb.issues(
 issueid int not null auto_increment,
 title varchar(100) not null,
 datecreated datetime not null,
-createdby int not null,
+companyid int not null,
 content text not null,
 status int not null,
 primary key (issueid),
-foreign key (createdby) references issuetrackerdb.userandcompany (userandcompanyid),
-foreign key (status) references issuetrackerdb.statuses (statusid)
+foreign key (companyid) references issuetrackerdb.companies (companyid),
+foreign key (status) references issuetrackerdb.statuses (statusid),
+unique key (title, content)
 );
 
 create table if not exists issuetrackerdb.comments(

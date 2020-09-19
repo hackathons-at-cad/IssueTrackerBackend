@@ -9,6 +9,7 @@ let {
   loginValidatorRules,
   signupValidatorRules,
   connection,
+  issueValidatorRules,
 } = require('./classes/utility');
 
 const app = express();
@@ -91,7 +92,6 @@ app.get('/api/company', middleWare, function (request, response) {
     if (error)
       return response.status(500).json({ ...payload, error: error.message });
     if (result) {
-      console.log(result);
       return response.status(200).json({ ...payload, result: result });
     }
   });
@@ -123,14 +123,82 @@ app.post('/api/company', middleWare, function (request, response) {
   }
 });
 
+// ISSUES
+
+app.post('/api/issues', middleWare, function (request, response) {
+  let { verifiedUser, issue } = request?.body;
+  let { title, content, status } = issue;
+  let { userid } = verifiedUser;
+  let validateIssue = new Validator(issue, issueValidatorRules);
+  if (validateIssue.fails())
+    return response
+      .status(403)
+      .json({ ...payload, error: validateIssue.errors });
+
+  let insertIssue = `insert into issuetrackerdb.issues(title, datecreated, companyid, content, status) values(?, now(), ?, ?, ?)`;
+
+  if (validateIssue.passes()) {
+    connection.query(insertIssue, [title, userid, content, status], function (
+      error,
+      result
+    ) {
+      if (error)
+        return response.status(500).json({ ...payload, error: error.message });
+      if (result) return response.sendStatus(201);
+    });
+  }
+});
+
+app.get('/api/issues', middleWare, function (request, response) {
+  let selectQuery = `select * from issuetrackerdb.issues where company`;
+});
+
+app.put('/api/issues', middleWare, function (request, response) {});
+
 function middleWare(request, response, next) {
-  let auth = request.body?.auth;
+  let { auth, company } = request.body;
+
   if (!auth) return response.sendStatus(403);
   if (auth) {
     let verify = jwt.verify(auth, process.env.SCRETSTRING);
-    request.body.verifiedUser = verify;
-    next();
-  }
+
+    if (!company) {
+      let queryDetails = `
+      SELECT * FROM issuetrackerdb.userandcompany 
+      join issuetrackerdb.users 
+      on issuetrackerdb.userandcompany.userid=userandcompanyid
+      join issuetrackerdb.companies 
+      on issuetrackerdb.userandcompany.companyid=issuetrackerdb.companies.companyid where issuetrackerdb.userandcompany.userid=?
+        `;
+      console.log(verify.userid);
+      connection.query(queryDetails, [verify.userid], function (error, result) {
+        if (error)
+          return response
+            .status(500)
+            .json({ ...payload, error: error.message });
+
+        if (result[0]) {
+          let company = ({
+            userid,
+            companyid,
+            firstname,
+            lastname,
+            datejoined,
+            email,
+            name: companyName,
+            category,
+            createdby,
+          } = result[0]);
+
+          request.body.verifiedUser = company;
+          next();
+        }
+      });
+    } else {
+      request.body.verifiedUser = verify;
+      next();
+    }
+  } else return response.sendStatus(403);
 }
 
 async function insertUserandCompany(userid, companyid) {

@@ -1,4 +1,5 @@
 let mysql = require('mysql');
+let nodemailer = require('nodemailer');
 
 const connection = mysql.createConnection({
   host: 'localhost',
@@ -25,6 +26,12 @@ const companyValidatorRules = {
   category: 'string',
 };
 
+const issueValidatorRules = {
+  content: 'required|string',
+  title: 'required|string',
+  status: 'required|string',
+};
+
 let payload = {
   error: [],
   result: [],
@@ -32,10 +39,18 @@ let payload = {
   auth: '',
 };
 
+let transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    sender: '',
+  },
+});
+
 module.exports = {
   payload,
   companyValidatorRules,
   loginValidatorRules,
   signupValidatorRules,
   connection,
+  issueValidatorRules,
 };
