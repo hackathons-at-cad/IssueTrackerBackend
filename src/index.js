@@ -109,4 +109,13 @@ app.post('/api/login', function (request, response) {
   }
 });
 
+function middleWare(request, response, next) {
+  let auth = request.body?.auth;
+  if (!auth) return response.sendStatus(403);
+  if (auth) {
+    let verify = jwt.verify(auth, process.env.SCRETSTRING);
+    console.log(verify);
+  }
+}
+
 app.listen(PORT, () => console.log('listening on port'));
