@@ -1,11 +1,13 @@
 let mysql = require('mysql');
 let nodemailer = require('nodemailer');
 
-const connection = mysql.createConnection({
-  host: 'localhost',
-  password: '',
-  user: 'root',
-  database: 'issuetrackerdb',
+//bc9cf0fc99f68b:fef42acf@us-cdbr-east-02.cleardb.com/heroku_213f9eefb18f399?reconnect=true
+
+mysql: const connection = mysql.createConnection({
+  host: 'us-cdbr-east-02.cleardb.com' | 'localhost',
+  password: 'fef42acf' | '',
+  user: 'bc9cf0fc99f68b' | 'root',
+  database: 'heroku_213f9eefb18f399' | 'issuetrackerdb',
 });
 
 const signupValidatorRules = {
