@@ -2,11 +2,12 @@ let mysql = require('mysql');
 let nodemailer = require('nodemailer');
 
 //bc9cf0fc99f68b:fef42acf@us-cdbr-east-02.cleardb.com/heroku_213f9eefb18f399?reconnect=true
+
 const connection = mysql.createConnection({
-  host: 'us-cdbr-east-02.cleardb.com' | 'localhost',
-  password: 'fef42acf' | '',
-  user: 'bc9cf0fc99f68b' | 'root',
-  database: 'heroku_213f9eefb18f399' | 'issuetrackerdb',
+  host: 'us-cdbr-east-02.cleardb.com',
+  password: 'fef42acf',
+  user: 'bc9cf0fc99f68b',
+  database: 'heroku_213f9eefb18f399',
 });
 
 const signupValidatorRules = {
