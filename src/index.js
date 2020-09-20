@@ -24,6 +24,10 @@ function setToken(user) {
 
 // ========== ENDPOINTS
 
+app.get('/', function (request, response) {
+  response.send('Issue tracker __cad hackathon');
+});
+
 // SIGN UP
 app.post('/api/signup', function (request, response) {
   const signupDetails = request?.body;
