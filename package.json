@@ -18,6 +18,7 @@
     "nodemon": "^2.0.4"
   },
   "scripts": {
-    "dev": "nodemon --watch src"
+    "dev": "nodemon --watch src",
+    "start": "node src/index.js"
   }
 }
